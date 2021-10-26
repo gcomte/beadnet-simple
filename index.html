@@ -113,15 +113,12 @@ circle.node-circle-onchain, .node-text-balance {
 
                         ],
                         [
-                            'Consequently, "LN1" could send 2 Msats to Relai.',
-                            { cmd: 'MOVE_BEADS', args: ['LN1', 'Relai', 2, null] },
+                            'Puzzle pays Bity 3 Bitcoin.',
+                            { cmd: 'MOVE_BEADS', args: ['Puzzle', 'Bity', 3, null] },
                         ],
                         [
-                            'At this point, since all the balance within this channel is owned by Relai, LN1 could not send any funds anymore on this channel, while Relai could not recieve any funds on this channel anymore. However, Relai could send, and LN1 could receive.',
-                        ],
-                        [
-                            'Let\'s send a Msat back.',
-                            { cmd: 'MOVE_BEADS', args: ['Relai', 'LN1', 1, null] },
+                            'Bity pays Puzzle 2 Bitcoin.',
+                            { cmd: 'MOVE_BEADS', args: ['Bity', 'Puzzle', 2, null] },
                         ],
                         [
                             'To emphasize the *network* in Lightning Network, let\'s interconnected the nodes that represent the Lightning Netowork with eachother themselves.',
