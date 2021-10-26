@@ -130,6 +130,17 @@ circle.node-circle-onchain, .node-text-balance {
                             { cmd: 'MOVE_BEADS', args: ['Bity', 'Puzzle', 3, null] },
                             { cmd: 'MOVE_BEADS', args: ['Puzzle', 'Satoshi', 3, null] },
                         ],
+			[
+                            'Alice pays Bity 1 Bitcoin.',
+                            { cmd: 'MOVE_BEADS', args: ['Alice', 'Satoshi', 1, null] },
+                            { cmd: 'MOVE_BEADS', args: ['Satoshi', 'Bity', 1, null] },
+                        ],
+			[
+                            'Multipath payments are possible: Satoshi pays Bity 4 Bitcoin.',
+                            { cmd: 'MOVE_BEADS', args: ['Satoshi', 'Bity', 2, null] },
+                            { cmd: 'MOVE_BEADS', args: ['Satoshi', 'Puzzle', 2, null] },
+                            { cmd: 'MOVE_BEADS', args: ['Puzzle', 'Bity', 2, null] },
+                        ],
                     ]
                 }
             });
