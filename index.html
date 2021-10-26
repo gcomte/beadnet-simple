@@ -102,11 +102,11 @@ circle.node-circle-onchain, .node-text-balance {
                                     { id: 'Bity', balance: 50 },
                                     { id: 'Puzzle', balance: 50 },
                                     { id: 'Satoshi', balance: 50 },
-                                    { id: 'Chuck Norris', balance: 50 },
+                                    { id: 'Alice', balance: 50 },
                                 ]]
                             },
-                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Chuck Norris', sourceBalance: 3, target: 'Satoshi', targetBalance: 2 }] },
-                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Chuck Norris', sourceBalance: 4, target: 'Puzzle', targetBalance: 1 }] },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Alice', sourceBalance: 3, target: 'Satoshi', targetBalance: 2 }] },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Alice', sourceBalance: 4, target: 'Puzzle', targetBalance: 1 }] },
                             { cmd: 'ADD_CHANNEL', args: [{ source: 'Bity', sourceBalance: 1, target: 'Puzzle', targetBalance: 5 }] },
                             { cmd: 'ADD_CHANNEL', args: [{ source: 'Bity', sourceBalance: 2, target: 'Satoshi', targetBalance: 3 }] },
                             { cmd: 'ADD_CHANNEL', args: [{ source: 'Puzzle', sourceBalance: 3, target: 'Satoshi', targetBalance: 3 }] },
@@ -121,92 +121,15 @@ circle.node-circle-onchain, .node-text-balance {
                             { cmd: 'MOVE_BEADS', args: ['Bity', 'Puzzle', 2, null] },
                         ],
                         [
-                            'Chuck Norris pays Bity 3 Bitcoin.',
-			    { cmd: 'MOVE_BEADS', args: ['Chuck Norris', 'Puzzle', 3, null] },
+                            'Alice pays Bity 3 Bitcoin.',
+			    { cmd: 'MOVE_BEADS', args: ['Alice', 'Puzzle', 3, null] },
 			    { cmd: 'MOVE_BEADS', args: ['Puzzle', 'Bity', 3, null] },
                         ],
-                        [
-                            'Let\'s add a couple of users.',
-                            { cmd: 'ADD_NODES', args: [[
-                                    { id: 'User1', balance: 50 },
-                                    { id: 'User2', balance: 50 },
-                                    { id: 'User3', balance: 50 },
-                                    { id: 'User4', balance: 50 },
-                                    { id: 'User5', balance: 50 },
-                                ]]
-                            },
+			[
+                            'Bity pays Satoshi 3 Bitcoin.',
+                            { cmd: 'MOVE_BEADS', args: ['Bity', 'Puzzle', 3, null] },
+                            { cmd: 'MOVE_BEADS', args: ['Puzzle', 'Satoshi', 3, null] },
                         ],
-                        [
-                            'We heavily focus on the use case "Users want to *buy* Bitcoin from *Relai*. This has a couple of implications.',
-                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 3, target: 'User1', targetBalance: 0 }] },
-                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 3, target: 'User2', targetBalance: 0 }] },
-                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 3, target: 'User3', targetBalance: 0 }] },
-                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 1, target: 'User4', targetBalance: 0 }] },
-                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 8, target: 'User5', targetBalance: 0 }] },
-                        ],
-                        [
-                            '1) For the sake of simplicity, we only allow users to have channels with the Relai node (at least for the first release). This is disadvantageous for the users, because they need to rely on Relai alone, instead of having multiple channels to choose from, choosing the cheapest on most reliable routes when making payments. On the other hands though, it gives us a lot of control when we know that we are the only counter party. We can neglect a lot of security issues, which we would otherwise have to deal with.',
-                        ],
-                        [
-                            '2) Relai opens the channel towards the users. This means, that all the balance is on Relai\'s side and consequently Relai can only *send*, while the users can only *receive* at the beginning. This will of course change over time, as users buy Bitcoin.',
-                        ],
-                        [
-                            '3) Relai has to lock in a lot of funds inside those channels, which basically are a hot wallet.',
-                        ],
-                        [
-                            'Also note, that the size we choose for each channel is crucial and in fact the right amount is different for every user.',
-                        ],
-                        [
-                            'Look at User4 for example. The channel is very small. This means that we can only send (and later on receive) a small amount of money through that channel. If the user needs more, we have no choice but to open another channel, which requires a costly on-chain transaction.',
-                        ],
-                        [
-                            'On the other extreme we have User5. While these capacity is great in the sense that we\'d probably never hit any limit with that user, there is another problem: We have locked up much more funds than actually required. This comes at a liquidity cost (how much Bitcoin do we have available to open channels with?) as well as a risk cost (hot wallet).',
-                        ],
-                        [
-                            'What is the perfect channel size? We will have to learn a lot about our users in general, as well as individually. Once again, every user will have a different "perfect channel size" depending on how he intends to use Relai.',
-                        ],
-                        [
-                            'Furthermore, since opening channels is costly, we should open channels only if they are really needed. Ideally we would open channels just when user buys funds, maybe even only if he creates a recurring buy while doing single buys on-chain still. (?). There is a caveat to this scheme though. We can only open channels with users when they are online and the have their wallet open. So for example when they set up their purchase. ',
-                        ],
-                        [
-                            'So let\'s say, User2 buys 1msat. First the Relai app needs to sign some data to prove the LN wallet is owned by the correct user (regulations ...). For this we can use the LN public key pair, which (unlike on the base layer) always stays the same over time.',
-                        ],
-                        [
-                            'After fiat arrived, we can send 1msat.',
-                            { cmd: 'MOVE_BEADS', args: ['Relai', 'User2', 1, null] },
-                        ],
-                        [
-                            'Oh that was quick! We can just send him the funds, in real-time. On top of that, all LN transaction between Relai and our users are COMPLETELY FREE (no cost at all)',
-                        ],
-                        [
-                            'Caveat: For receiving money too, the Relai App needs to be online and open. Let\'s send the user a push notification which leads him to open the app for this. Ideally we even create a LN invoice on the Relai App, which we send to the back-end and the back-end immediately pays it.',
-                        ],
-                        [
-                            'Whenever we have to open a channel AND send an LN payment at the same time, we can do this in one step by setting the push-amt to the respective value.'
-                        ],
-                        [
-                            'User1 buys 3 Msat.',
-                            { cmd: 'MOVE_BEADS', args: ['Relai', 'User1', 3, null] },
-                        ],
-                        [
-                            'Users can also send money to other Relai users or in fact to anywhere in the network!',
-                        ],
-                        [
-                            'User1 sends 1Msat to User3. [Remember, receiving node must be online too]',
-                            { cmd: 'MOVE_BEADS', args: ['User1', 'Relai', 1, null] },
-                            { cmd: 'MOVE_BEADS', args: ['Relai', 'User3', 1, null] },
-                        ],
-                        [
-                            'User3 spends that money on Bitrefill which itself is somehow connected to the node LN2.',
-                            { cmd: 'MOVE_BEADS', args: ['User3', 'Relai', 1, null] },
-                            { cmd: 'MOVE_BEADS', args: ['Relai', 'LN2', 1, null] },
-                        ],
-                        [
-                            'Whenever users want to spend money within the Lightning network, they have to do that over the Relai node because it is the only LN node they are connected to. Relai can take a fee for this service if it wants to.',
-                        ],
-                        [
-                            'Once a user wants "to go on-chain", we need to provide a functionality to close all LN channels. We should aim for cooperative closes instead of force-closes. If the user had only very few sats in their pocket, this event would possibly eat away all of his funds.',
-                        ]
                     ]
                 }
             });
