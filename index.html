@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BeadNet demo for Relai</title>
+    <link rel="stylesheet" href="./docs/styles/jsdoc-default.css">
+    <meta charset="utf-8">
+    <style>
+circle.node-circle-onchain, .node-text-balance {
+    display: none !important;
+}
+
+        body,
+        html {
+            width: 100%;
+            margin: 0;
+        }
+
+        p {
+            margin-left: 20px;
+        }
+
+        #beadnet {
+            border: 3px solid gray;
+            box-sizing: border-box;
+            position: absolute;
+            top: 150px;
+            left: 0;
+            bottom: 0;
+            right: 430px;
+            height: calc(100% - 151px);
+        }
+
+        #controls {
+            position: absolute;
+            background-color: lightgray;
+            top: 150px;
+            width: 400px;
+            bottom: 0;
+            right: 0;
+            padding: 15px;
+        }
+
+        @font-face {
+            font-family: 'bitcoinregular';
+            src: url('dist/bitcoin-webfont.eot');
+            src: url('dist/bitcoin-webfont.eot?#iefix') format('embedded-opentype'),
+            url('dist/bitcoin-webfont.woff2') format('woff2'),
+            url('dist/bitcoin-webfont.woff') format('woff'),
+            url('dist/bitcoin-webfont.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js"></script>
+    <script src="dist/beadnet.standalone.min.js"></script>
+</head>
+<body>
+<h1 id="beadnet-alpha-preview-">BeadNet demo for Puzzle ITC</h1>
+<p>
+    A visualisation of how Lightning Network salary payments could work at Puzzle ITC and how our employees
+    could spend all their money at Digitec ;-)<br/>
+    This demo is based on the <a href="https://github.com/mojoaxel/beadnet">BeadNet library</a> of
+    <a href="//github.com/mojoaxel">Alexander Wunschik</a>.
+</p>
+<!--
+<br/><br/><br/>
+<h4>Todo:</h4>
+<ul>
+    <li>Optimize channel draw length, node placement. Maybe give some nodes a flag that they're routing nodes.</li>
+    <li>Node info on click</li>
+    <li>Moving beads different color</li>
+</ul>
+-->
+
+<div id="container">
+    <div id="beadnet"></div>
+    <div id="controls">
+        <fieldset id="add-node">
+            <legend>presentation</legend>
+            <button id="nextStep">Next Step</button>
+        </fieldset>
+        <fieldset id="description">
+            <legend>current step</legend>
+            <div id="description-body"></div>
+        </fieldset>
+    </div>
+
+    <script>
+        window.onload = function () {
+
+            var colors = d3.scaleOrdinal(d3.schemeCategory10);
+
+            // initialize BeadNet
+            window.bn = new beadnet({
+                colorScheme: colors,
+                presentation: {
+                    steps: [
+                        [
+                            'Relai has its own Lightning node, which is well-connected to the Lightning Network. The entire Lightning Network is represented by 3 nodes.',
+                            { cmd: 'ADD_NODES', args: [[
+                                    { id: 'Relai', balance: 5000 },
+                                    { id: 'LN1', balance: 50 },
+                                    { id: 'LN2', balance: 50 },
+                                    { id: 'LN3', balance: 50 },
+                                ]]
+                            },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 1, target: 'LN1', targetBalance: 2 }] },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 1, target: 'LN2', targetBalance: 5 }] },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 2, target: 'LN3', targetBalance: 3 }] },
+
+                        ],
+                        [
+                            'Every channel must have a size in Bitcoin. A Bitcoin is worth a lot these days. Let\'s instead use Msat (million Satoshis) as a unit of account.',
+                        ],
+                        [
+                            'Okay! Let\'s have a look at the channel between "LN1" and Relai for example. This channel was opened in a on-chain transaction with 0.03 BTC or 3 Msat.',
+                        ],
+                        [
+                            'This means, that "LN1" and Relai have now the possibility to send 3 Msats between eachother, but each party can only send the amount they own themselves within the channel. In this case, Relai owns 1 Msat, and "LN1" owns 2 Msat.',
+                        ],
+                        [
+                            'Consequently, "LN1" could send 2 Msats to Relai.',
+                            { cmd: 'MOVE_BEADS', args: ['LN1', 'Relai', 2, null] },
+                        ],
+                        [
+                            'At this point, since all the balance within this channel is owned by Relai, LN1 could not send any funds anymore on this channel, while Relai could not recieve any funds on this channel anymore. However, Relai could send, and LN1 could receive.',
+                        ],
+                        [
+                            'Let\'s send a Msat back.',
+                            { cmd: 'MOVE_BEADS', args: ['Relai', 'LN1', 1, null] },
+                        ],
+                        [
+                            'To emphasize the *network* in Lightning Network, let\'s interconnected the nodes that represent the Lightning Netowork with eachother themselves.',
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'LN1', sourceBalance: 2, target: 'LN2', targetBalance: 2 }] },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'LN1', sourceBalance: 5, target: 'LN3', targetBalance: 2 }] },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'LN2', sourceBalance: 4, target: 'LN3', targetBalance: 4 }] },
+                        ],
+                        [
+                            'Let\'s add a couple of users.',
+                            { cmd: 'ADD_NODES', args: [[
+                                    { id: 'User1', balance: 50 },
+                                    { id: 'User2', balance: 50 },
+                                    { id: 'User3', balance: 50 },
+                                    { id: 'User4', balance: 50 },
+                                    { id: 'User5', balance: 50 },
+                                ]]
+                            },
+                        ],
+                        [
+                            'We heavily focus on the use case "Users want to *buy* Bitcoin from *Relai*. This has a couple of implications.',
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 3, target: 'User1', targetBalance: 0 }] },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 3, target: 'User2', targetBalance: 0 }] },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 3, target: 'User3', targetBalance: 0 }] },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 1, target: 'User4', targetBalance: 0 }] },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 8, target: 'User5', targetBalance: 0 }] },
+                        ],
+                        [
+                            '1) For the sake of simplicity, we only allow users to have channels with the Relai node (at least for the first release). This is disadvantageous for the users, because they need to rely on Relai alone, instead of having multiple channels to choose from, choosing the cheapest on most reliable routes when making payments. On the other hands though, it gives us a lot of control when we know that we are the only counter party. We can neglect a lot of security issues, which we would otherwise have to deal with.',
+                        ],
+                        [
+                            '2) Relai opens the channel towards the users. This means, that all the balance is on Relai\'s side and consequently Relai can only *send*, while the users can only *receive* at the beginning. This will of course change over time, as users buy Bitcoin.',
+                        ],
+                        [
+                            '3) Relai has to lock in a lot of funds inside those channels, which basically are a hot wallet.',
+                        ],
+                        [
+                            'Also note, that the size we choose for each channel is crucial and in fact the right amount is different for every user.',
+                        ],
+                        [
+                            'Look at User4 for example. The channel is very small. This means that we can only send (and later on receive) a small amount of money through that channel. If the user needs more, we have no choice but to open another channel, which requires a costly on-chain transaction.',
+                        ],
+                        [
+                            'On the other extreme we have User5. While these capacity is great in the sense that we\'d probably never hit any limit with that user, there is another problem: We have locked up much more funds than actually required. This comes at a liquidity cost (how much Bitcoin do we have available to open channels with?) as well as a risk cost (hot wallet).',
+                        ],
+                        [
+                            'What is the perfect channel size? We will have to learn a lot about our users in general, as well as individually. Once again, every user will have a different "perfect channel size" depending on how he intends to use Relai.',
+                        ],
+                        [
+                            'Furthermore, since opening channels is costly, we should open channels only if they are really needed. Ideally we would open channels just when user buys funds, maybe even only if he creates a recurring buy while doing single buys on-chain still. (?). There is a caveat to this scheme though. We can only open channels with users when they are online and the have their wallet open. So for example when they set up their purchase. ',
+                        ],
+                        [
+                            'So let\'s say, User2 buys 1msat. First the Relai app needs to sign some data to prove the LN wallet is owned by the correct user (regulations ...). For this we can use the LN public key pair, which (unlike on the base layer) always stays the same over time.',
+                        ],
+                        [
+                            'After fiat arrived, we can send 1msat.',
+                            { cmd: 'MOVE_BEADS', args: ['Relai', 'User2', 1, null] },
+                        ],
+                        [
+                            'Oh that was quick! We can just send him the funds, in real-time. On top of that, all LN transaction between Relai and our users are COMPLETELY FREE (no cost at all)',
+                        ],
+                        [
+                            'Caveat: For receiving money too, the Relai App needs to be online and open. Let\'s send the user a push notification which leads him to open the app for this. Ideally we even create a LN invoice on the Relai App, which we send to the back-end and the back-end immediately pays it.',
+                        ],
+                        [
+                            'Whenever we have to open a channel AND send an LN payment at the same time, we can do this in one step by setting the push-amt to the respective value.'
+                        ],
+                        [
+                            'User1 buys 3 Msat.',
+                            { cmd: 'MOVE_BEADS', args: ['Relai', 'User1', 3, null] },
+                        ],
+                        [
+                            'Users can also send money to other Relai users or in fact to anywhere in the network!',
+                        ],
+                        [
+                            'User1 sends 1Msat to User3. [Remember, receiving node must be online too]',
+                            { cmd: 'MOVE_BEADS', args: ['User1', 'Relai', 1, null] },
+                            { cmd: 'MOVE_BEADS', args: ['Relai', 'User3', 1, null] },
+                        ],
+                        [
+                            'User3 spends that money on Bitrefill which itself is somehow connected to the node LN2.',
+                            { cmd: 'MOVE_BEADS', args: ['User3', 'Relai', 1, null] },
+                            { cmd: 'MOVE_BEADS', args: ['Relai', 'LN2', 1, null] },
+                        ],
+                        [
+                            'Whenever users want to spend money within the Lightning network, they have to do that over the Relai node because it is the only LN node they are connected to. Relai can take a fee for this service if it wants to.',
+                        ],
+                        [
+                            'Once a user wants "to go on-chain", we need to provide a functionality to close all LN channels. We should aim for cooperative closes instead of force-closes. If the user had only very few sats in their pocket, this event would possibly eat away all of his funds.',
+                        ]
+                    ]
+                }
+            });
+            var descBody = document.querySelector('#description-body');
+            descBody.innerHTML = bn.nextStep();
+
+            var btnNextStep = document.querySelector('button#nextStep');
+            btnNextStep.addEventListener('click', function () {
+                descBody.innerHTML = bn.nextStep();
+            });
+
+        };
+    </script>
+</div>
+
+</body>
+</html>
