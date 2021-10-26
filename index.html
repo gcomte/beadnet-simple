@@ -97,27 +97,20 @@ circle.node-circle-onchain, .node-text-balance {
                 presentation: {
                     steps: [
                         [
-                            'Relai has its own Lightning node, which is well-connected to the Lightning Network. The entire Lightning Network is represented by 3 nodes.',
+                            'There is a very small Lightning Network',
                             { cmd: 'ADD_NODES', args: [[
-                                    { id: 'Relai', balance: 5000 },
-                                    { id: 'LN1', balance: 50 },
-                                    { id: 'LN2', balance: 50 },
-                                    { id: 'LN3', balance: 50 },
+                                    { id: 'Bity', balance: 50 },
+                                    { id: 'Puzzle', balance: 50 },
+                                    { id: 'Satoshi', balance: 50 },
+                                    { id: 'Chuck Norris', balance: 50 },
                                 ]]
                             },
-                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 1, target: 'LN1', targetBalance: 2 }] },
-                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 1, target: 'LN2', targetBalance: 5 }] },
-                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Relai', sourceBalance: 2, target: 'LN3', targetBalance: 3 }] },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Chuck Norris', sourceBalance: 3, target: 'Satoshi', targetBalance: 2 }] },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Chuck Norris', sourceBalance: 4, target: 'Puzzle', targetBalance: 1 }] },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Bity', sourceBalance: 1, target: 'Puzzle', targetBalance: 5 }] },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Bity', sourceBalance: 2, target: 'Satoshi', targetBalance: 3 }] },
+                            { cmd: 'ADD_CHANNEL', args: [{ source: 'Puzzle', sourceBalance: 3, target: 'Satoshi', targetBalance: 3 }] },
 
-                        ],
-                        [
-                            'Every channel must have a size in Bitcoin. A Bitcoin is worth a lot these days. Let\'s instead use Msat (million Satoshis) as a unit of account.',
-                        ],
-                        [
-                            'Okay! Let\'s have a look at the channel between "LN1" and Relai for example. This channel was opened in a on-chain transaction with 0.03 BTC or 3 Msat.',
-                        ],
-                        [
-                            'This means, that "LN1" and Relai have now the possibility to send 3 Msats between eachother, but each party can only send the amount they own themselves within the channel. In this case, Relai owns 1 Msat, and "LN1" owns 2 Msat.',
                         ],
                         [
                             'Consequently, "LN1" could send 2 Msats to Relai.',
